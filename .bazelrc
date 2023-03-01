@@ -1,0 +1,137 @@
+
+# Always use `Debug` config
+build --config=Debug
+
+## TESTING
+
+# Add the PATH to the test environment so that common macOS tools can be found
+# during a test run.
+# test --test_env=PATH
+
+# `bazel test` tries to build everything also by default, so skip that.
+test --build_tests_only
+
+# Added in https://github.com/bazelbuild/rules_apple/pull/1810
+test --test_env="STARTUP_TIMEOUT_SEC=300"
+
+## BUILDING
+
+# We are essentially always building for iOS. Having this here makes various
+# `bazel query`, `bazel aquery`, etc. perform in the iOS platform space by default.
+build --apple_platform_type=ios
+
+# Use the same `proto_compiler` throughout the entire build. This follows the
+# following [note](https://github.com/bazelbuild/rules_swift/commit/664b15349aefff6f1ec5d49391817158b3df55b3#diff-e476859aa4b24ff65d61ff6003518211fd6fb6c277914ea28eb9241483319a12R73-R75)
+# and avoids duplicate symbol issues when a dependency exists explicitly on
+# `@com_github_apple_swift_protobuf//:SwiftProtobuf`.
+build --proto_compiler=@build_bazel_rules_swift//tools/protoc_wrapper:protoc
+
+# Fix Test Issue navigation
+build --features apple.swizzle_absolute_xcttestsourcelocation
+
+# Disable bitcode for all builds/binaries.
+build --apple_bitcode=none
+
+# We currently only support building on Xcode 14.2.0
+build --xcode_version=
+build --xcode_version_config=//:host_xcodes
+
+# We currently support Monterey (for our macOS CI hosts) and Ventura (for local development).
+build --host_macos_minimum_os=12.5
+
+# Debugging does not work in sandbox mode.
+#
+# Force the tests to not run in sandboxed mode, since it can introduce
+# errors and flakes.
+build --spawn_strategy=local
+
+# Print the full command line for commands that failed.
+build --verbose_failures
+# Print log file output to the console on failure.
+build --test_output=errors
+
+# Use 'worker' strategy for swift compilation.
+build --strategy=SwiftCompile=worker
+
+# Turn on the strict action env
+# By default, many actions leak variables like HOME, PATH which break caching
+# This makes it possible to cache hit CI builds locally
+build --incompatible_strict_action_env
+
+# Make all swiftc invocations use the same module cache.
+# Otherwise each invocation has to generate its own cache which can be very expensive for many invocations.
+#
+# `swift.cacheable_swiftmodules` passes `-no-serialize-debugging-options` to
+# `swiftc`, which fixes lldb crashes and increases cache hit rates.
+build --features swift.cacheable_swiftmodules
+build --features swift.use_global_module_cache
+
+build --features apple.virtualize_frameworks
+
+# Proto - PathToUnderscores
+build --features=swift.generate_path_to_underscores_from_proto_files
+
+# Whole Module Optimization.
+build --features=swift.opt_uses_wmo
+build --swiftcopt=-whole-module-optimization
+
+# This flips enable_global_index_store - see docs/index_while_building.md for a
+# detailed summary
+build --features swift.use_global_index_store
+build --features swift.index_while_building
+build --features swift.disable_system_index
+
+# Enable dbg compilation mode in this repo, so we can test xcodeproj-built
+# binaries contain debug symbol tables.
+#
+# This is set below in the configuration section.
+#
+# build --compilation_mode=dbg
+
+# Avoid remote cache for the following that can be done locally quickly.
+build \
+  --modify_execution_info=^(BaselineCoverage|BitcodeSymbolsCopy|BundleApp|BundleTreeApp|DsymDwarf|DsymLipo|GenerateAppleSymbolsFile|ObjcBinarySymbolStrip|CppLink|ObjcLink|ProcessAndSign|SwiftArchive)$=+no-remote,^(BundleResources|ImportedDynamicFrameworkProcessor|TestRunner|SwiftStdlibCopy)$=+no-remote-exec
+
+# Ensure cache hits in debug information from both compilation
+# and link actions. This will encode `$PWD=.` instead.
+build --features oso_prefix_is_pwd
+build --features debug_prefix_map_pwd_is_dot
+build --features swift.debug_prefix_map
+
+# `relative_ast_path` uses relative paths when passing `--add_ast_path` to the
+# linker, which increases cache hit rates.
+#
+# Reference: https://github.com/buildbuddy-io/rules_xcodeproj/blob/1f0a83af8fc3cc2ea479af9dd7f85d249cae575b/xcodeproj/internal/xcodeproj.template.bazelrc#L31-L34
+build --features=relative_ast_path
+
+## COVERAGE
+
+# disable LCOV_MERGER
+coverage --test_env="LCOV_MERGER=/usr/bin/true"
+
+# enable LLVM covmaps
+coverage --experimental_use_llvm_covmap
+
+# maximize 'Debug' cache hits with CI by emulating a 'bazel coverage' build
+build:Debug --experimental_use_llvm_covmap
+build:Debug --collect_code_coverage
+
+# This is required to find the correct XCFramework slice
+# in 'rules_ios' when building on an M1 despite the
+# correct slices existing in the config.
+build --features apple.arm64_simulator_use_device_deps
+
+# Ensure consistent Java environment.
+build --java_runtime_version=remotejdk_11
+
+## rules_xcodeproj
+
+build:Debug --@com_github_buildbuddy_io_rules_xcodeproj//xcodeproj:extra_common_flags='--config=Debug'
+
+# Removes potentially large unneeded event from the BEP
+build --nolegacy_important_outputs
+
+# User Overrides
+
+# Load a user.bazelrc
+try-import %workspace%/user.bazelrc
