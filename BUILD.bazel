@@ -1,3 +1,5 @@
+load(":helpers.bzl", "xcodeproj")
+
 # Xcode Version [https://www.smileykeith.com/2021/03/08/locking-xcode-in-bazel/]
 
 xcode_version(
@@ -20,4 +22,11 @@ xcode_config(
     name = "host_xcodes",
     default = ":version14_2_0_14C18",
     versions = [":version14_2_0_14C18"],
+)
+
+xcodeproj(
+    name = "Project",
+    deps = [
+        "//SmallFramework:SmallFrameworkTests",
+    ],
 )
