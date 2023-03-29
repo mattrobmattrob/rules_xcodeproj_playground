@@ -28,7 +28,9 @@ xcode_config(
 xcodeproj(
     name = "Project",
     deps = [
-        "//SwiftFramework:SwiftFrameworkTests",
+        "//Tests:MixedTests",
+        "//Tests:ObjCTests",
+        "//Tests:SwiftTests",
     ],
 )
 

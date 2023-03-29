@@ -1,0 +1,71 @@
+load("@build_bazel_rules_ios//rules:test.bzl", rules_ios_ios_unit_test = "ios_unit_test")
+
+rules_ios_ios_unit_test(
+    name = "SwiftTests",
+    size = "medium",
+    minimum_os_version = "14.0",
+    srcs = [
+        "SwiftTestsSource/SwiftTest.swift"
+    ],
+    visibility = ["//visibility:public"],
+    runner = "//:standard_runner",
+    test_host = None,
+    infoplists = [":UnitTest-Info.plist"],
+    env = {
+        "IS_EXECUTING_TEST": "1",
+    },
+    module_name = "SwiftTests",
+    deps = [
+        "//SwiftFramework",
+    ],
+    sdk_frameworks = [
+        "XCTest",
+    ],
+)
+
+rules_ios_ios_unit_test(
+    name = "ObjCTests",
+    size = "medium",
+    minimum_os_version = "14.0",
+    srcs = [
+        "ObjCTestsSource/ObjCTest.m",
+    ],
+    visibility = ["//visibility:public"],
+    runner = "//:standard_runner",
+    test_host = None,
+    infoplists = [":UnitTest-Info.plist"],
+    env = {
+        "IS_EXECUTING_TEST": "1",
+    },
+    module_name = "MixedTests",
+    deps = [
+        "//SwiftFramework",
+    ],
+    sdk_frameworks = [
+        "XCTest",
+    ],
+)
+
+rules_ios_ios_unit_test(
+    name = "MixedTests",
+    size = "medium",
+    minimum_os_version = "14.0",
+    srcs = [
+        "MixedTestsSource/SwiftTest.swift",
+        "MixedTestsSource/ObjCTest.m",
+    ],
+    visibility = ["//visibility:public"],
+    runner = "//:standard_runner",
+    test_host = None,
+    infoplists = [":UnitTest-Info.plist"],
+    env = {
+        "IS_EXECUTING_TEST": "1",
+    },
+    module_name = "MixedTests",
+    deps = [
+        "//SwiftFramework",
+    ],
+    sdk_frameworks = [
+        "XCTest",
+    ],
+)
