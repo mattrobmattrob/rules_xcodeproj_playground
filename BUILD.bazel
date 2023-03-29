@@ -1,3 +1,4 @@
+load("@build_bazel_rules_apple//apple/testing/default_runner:ios_test_runner.bzl", "ios_test_runner")
 load(":helpers.bzl", "xcodeproj")
 
 # Xcode Version [https://www.smileykeith.com/2021/03/08/locking-xcode-in-bazel/]
@@ -27,6 +28,12 @@ xcode_config(
 xcodeproj(
     name = "Project",
     deps = [
-        "//SmallFramework:SmallFrameworkTests",
+        "//SwiftFramework:SwiftFrameworkTests",
     ],
+)
+
+ios_test_runner(
+    name = "standard_runner",
+    device_type = "iPhone 8 Plus",
+    visibility = ["//visibility:public"],
 )

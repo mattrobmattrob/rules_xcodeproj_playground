@@ -1,5 +1,5 @@
 
-import SmallFramework
+import SwiftFramework
 import XCTest
 
 final class SmallTest: XCTestCase {

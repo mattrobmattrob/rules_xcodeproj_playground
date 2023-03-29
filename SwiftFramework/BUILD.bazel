@@ -1,25 +1,18 @@
 load("@build_bazel_rules_ios//rules:framework.bzl", rules_ios_apple_framework = "apple_framework")
 load("@build_bazel_rules_ios//rules:test.bzl", rules_ios_ios_unit_test = "ios_unit_test")
-load("@build_bazel_rules_apple//apple/testing/default_runner:ios_test_runner.bzl", "ios_test_runner")
-
-ios_test_runner(
-    name = "standard_runner",
-    device_type = "iPhone 8 Plus",
-    visibility = ["//visibility:public"],
-)
 
 _DEFAULT_IOS_VERSION = "14.0"
 
 rules_ios_apple_framework(
-    name = "SmallFramework",
-    module_name = "SmallFramework",
+    name = "SwiftFramework",
+    module_name = "SwiftFramework",
     testonly = False,
-    srcs = ["SmallFramework/FooBart.swift"],
+    srcs = ["SwiftFramework/FooBart.swift"],
     platforms = {
         "ios": _DEFAULT_IOS_VERSION,
     },
     infoplists = [":Framework-Info.plist"],
-    bundle_id = "com.reddit.SmallFramework",
+    bundle_id = "com.reddit.SwiftFramework",
     link_dynamic = False,
     visibility = ["//visibility:public"],
     xcconfig = {"APPLICATION_EXTENSION_API_ONLY": "YES"},
@@ -29,20 +22,20 @@ rules_ios_apple_framework(
 )
 
 rules_ios_ios_unit_test(
-    name = "SmallFrameworkTests",
+    name = "SwiftFrameworkTests",
     size = "medium",
     minimum_os_version = _DEFAULT_IOS_VERSION,
-    srcs = ["SmallFrameworkTests/SmallTest.swift"],
+    srcs = ["SwiftFrameworkTests/SmallTest.swift"],
     visibility = ["//visibility:public"],
-    runner = ":standard_runner",
+    runner = "//:standard_runner",
     test_host = None,
     infoplists = [":UnitTest-Info.plist"],
     env = {
         "IS_EXECUTING_TEST": "1",
     },
-    module_name = "SmallFrameworkTests",
+    module_name = "SwiftFrameworkTests",
     deps = [
-        ":SmallFramework",
+        ":SwiftFramework",
     ],
     sdk_frameworks = [
         "XCTest",
