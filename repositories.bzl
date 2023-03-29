@@ -61,9 +61,9 @@ def workspace_dependencies():
 
     # rules_xcodeproj
     _github_archive(
-        name = "com_github_buildbuddy_io_rules_xcodeproj",
+        name = "rules_xcodeproj",
         path = "buildbuddy-io/rules_xcodeproj",
-        # main, as of 2022-02-21
-        commit = "3a2153f696713c323af570813a479989b052ea58",
-        sha256 = "d83f9fe4080cab6c4bea04d548aad82f433820faf14f0ffc935974fe9f1978f4",
+        # main, as of 2023-03-20
+        commit = "047775d86a0db85e821bbbe1bd4d5ca1cba8fabc",
+        sha256 = "",
     )

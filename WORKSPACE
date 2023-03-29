@@ -50,7 +50,7 @@ load(
 protobuf_deps()
 
 load(
-    "@com_github_buildbuddy_io_rules_xcodeproj//xcodeproj:repositories.bzl",
+    "@rules_xcodeproj//xcodeproj:repositories.bzl",
     "xcodeproj_rules_dependencies",
 )
 

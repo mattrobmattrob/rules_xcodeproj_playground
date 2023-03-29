@@ -126,7 +126,7 @@ build --java_runtime_version=remotejdk_11
 
 ## rules_xcodeproj
 
-build:Debug --@com_github_buildbuddy_io_rules_xcodeproj//xcodeproj:extra_common_flags='--config=Debug'
+build:Debug --@rules_xcodeproj//xcodeproj:extra_common_flags='--config=Debug'
 
 # Removes potentially large unneeded event from the BEP
 build --nolegacy_important_outputs
